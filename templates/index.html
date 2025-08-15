@@ -82,7 +82,7 @@
 
   <section class="table-section">
     <h2>All time zones</h2>
-    <input id="search" type="search" placeholder="Search time zones... (e.g., Europe/ , America/ , *UTC*)" />
+    <input id="search" type="search" placeholder="Search zones or codes (e.g., UTC, GMT, Europe/)" />
     <table class="table" id="zones-table">
       <thead>
         <tr>
@@ -94,7 +94,7 @@
       <tbody>
         {% for r in all_rows %}
         <tr>
-          <td>{{ r.zone }}</td>
+          <td>{{ r.zone }} <small class="tz-abbr">{{ r.abbr }}</small></td>
           <td>{{ r.now.strftime('%Y-%m-%d %H:%M') }}</td>
           <td>{{ r.offset }}</td>
         </tr>
