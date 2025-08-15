@@ -28,3 +28,20 @@
     }
   });
 })();
+
+// Swap selected time zones and submit the form
+(function swapZones() {
+  const btn = document.getElementById('swap');
+  const form = document.getElementById('compare-form');
+  if (!btn || !form) return;
+  btn.addEventListener('click', () => {
+    const a = document.getElementById('my_tz');
+    const b = document.getElementById('other_tz');
+    if (a && b) {
+      const tmp = a.value;
+      a.value = b.value;
+      b.value = tmp;
+      form.submit();
+    }
+  });
+})();

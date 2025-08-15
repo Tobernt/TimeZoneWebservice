@@ -32,9 +32,12 @@
         </select>
       </div>
 
-      <button type="submit">Compare</button>
+      <div class="control buttons">
+        <button type="button" id="swap">Swap</button>
+        <button type="submit">Compare</button>
+      </div>
     </form>
-    <small class="hint">Tip: Your browser’s time zone will auto-fill on load; you can still pick any zone.</small>
+    <small class="hint">Tip: Your browser's time zone will auto-fill on load; you can still pick any zone.</small>
   </section>
 
   <section class="result">
@@ -52,7 +55,7 @@
         <p class="offset">UTC {{ diff.b.strftime('%z')[:3] }}:{{ diff.b.strftime('%z')[3:5] }}</p>
       </div>
     </div>
-    <p class="delta">Difference: <strong>{{ diff.pretty }}</strong></p>
+    <p class="delta">{{ diff.description }} ({{ diff.pretty }})</p>
   </section>
 
   <section class="table-section">

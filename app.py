@@ -44,12 +44,21 @@ def difference(tz_a: str, tz_b: str, at: datetime | None = None):
     sign = 1 if delta >= 0 else -1
     h = int(abs(delta))
     m = int(round((abs(delta) - h) * 60))
+    pretty_abs = f"{h}h {m:02d}m"
+    direction = "ahead of" if sign > 0 else "behind" if sign < 0 else "the same time as"
+    if sign == 0:
+        description = f"{tz_b} is the same time as {tz_a}"
+    else:
+        description = f"{tz_b} is {pretty_abs} {direction} {tz_a}"
     return {
         "a": a,
         "b": b,
         "hours": sign * h,
         "minutes": sign * m,
-        "pretty": f"{('+' if sign>0 else '-')}{h:01d}h {m:02d}m"
+        "pretty": f"{('+' if sign>0 else '-')}{h:01d}h {m:02d}m",
+        "direction": direction,
+        "pretty_abs": pretty_abs,
+        "description": description,
     }
 
 
