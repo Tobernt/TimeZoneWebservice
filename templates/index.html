@@ -9,7 +9,7 @@
 <body>
   <header>
     <h1>Timezone Comparator</h1>
-    <p>See every IANA time zone, auto-detect your own, and compare offsets quickly.</p>
+    <p>Compare simple UTC offsets and common time codes.</p>
   </header>
 
   <section class="controls">
@@ -37,7 +37,7 @@
         <button type="submit">Compare</button>
       </div>
     </form>
-    <small class="hint">Tip: Your browser's time zone will auto-fill on load; you can still pick any zone.</small>
+    <small class="hint">Tip: Your browser's time code will auto-fill on load; you can still pick any code.</small>
   </section>
 
   <section class="result">
@@ -81,8 +81,8 @@
   </section>
 
   <section class="table-section">
-    <h2>All time zones</h2>
-    <input id="search" type="search" placeholder="Search zones or codes (e.g., UTC, GMT, Europe/)" />
+    <h2>All time codes</h2>
+    <input id="search" type="search" placeholder="Search codes (e.g., UTC, UTC+1, CET)" />
     <table class="table" id="zones-table">
       <thead>
         <tr>
