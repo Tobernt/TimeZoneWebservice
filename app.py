@@ -1,5 +1,5 @@
 from __future__ import annotations
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 from datetime import datetime, timedelta, timezone
 from datetime import tzinfo
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -106,6 +106,29 @@ def difference(tz_a: str, tz_b: str, at: datetime | None = None):
         "pretty_abs": pretty_abs,
         "description": description,
     }
+
+
+@app.get("/api/compare")
+def api_compare():
+    """Return JSON describing the time conversion between two zones."""
+    my_tz = request.args.get("my_tz") or "UTC"
+    other_tz = request.args.get("other_tz") or "UTC+01:00"
+    time_str = request.args.get("time")
+    if time_str:
+        dt = datetime.fromisoformat(time_str).replace(tzinfo=_resolve_tz(my_tz))
+    else:
+        dt = now_utc().astimezone(_resolve_tz(my_tz))
+    diff = difference(my_tz, other_tz, dt)
+    return jsonify(
+        {
+            "my_time": diff["a"].strftime("%Y-%m-%d %H:%M"),
+            "other_time": diff["b"].strftime("%Y-%m-%d %H:%M"),
+            "my_offset": fmt_offset(_resolve_tz(my_tz)),
+            "other_offset": fmt_offset(_resolve_tz(other_tz)),
+            "pretty": diff["pretty"],
+            "description": diff["description"],
+        }
+    )
 
 
 @app.route("/")
