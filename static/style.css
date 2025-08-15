@@ -59,6 +59,12 @@ header {
   text-align: left;
 }
 
+.tz-abbr {
+  color: #666;
+  font-size: 0.8em;
+  margin-left: 0.25rem;
+}
+
 #search {
   width: 100%;
   padding: 0.5rem;

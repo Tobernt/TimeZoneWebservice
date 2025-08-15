@@ -32,6 +32,7 @@ def current_time_in_zone(tz_name: str):
         "zone": tz_name,
         "now": dt,
         "offset": fmt_offset(tz),
+        "abbr": dt.tzname() or "",
     }
 
 
@@ -39,9 +40,12 @@ def difference(tz_a: str, tz_b: str, at: datetime | None = None):
     at = at or now_utc()
     a = at.astimezone(ZoneInfo(tz_a))
     b = at.astimezone(ZoneInfo(tz_b))
-    delta = (b - a).total_seconds() / 3600.0  # hours (float)
+    # Compare the UTC offsets to determine the difference between zones
+    offset_a = a.utcoffset() or timedelta()
+    offset_b = b.utcoffset() or timedelta()
+    delta = (offset_b - offset_a).total_seconds() / 3600.0  # hours (float)
     # Normalize to absolute hours/minutes for display, keep sign separately
-    sign = 1 if delta >= 0 else -1
+    sign = 1 if delta > 0 else -1 if delta < 0 else 0
     h = int(abs(delta))
     m = int(round((abs(delta) - h) * 60))
     pretty_abs = f"{h}h {m:02d}m"
@@ -55,7 +59,7 @@ def difference(tz_a: str, tz_b: str, at: datetime | None = None):
         "b": b,
         "hours": sign * h,
         "minutes": sign * m,
-        "pretty": f"{('+' if sign>0 else '-')}{h:01d}h {m:02d}m",
+        "pretty": f"{('+' if delta >= 0 else '-')}{h:01d}h {m:02d}m",
         "direction": direction,
         "pretty_abs": pretty_abs,
         "description": description,
