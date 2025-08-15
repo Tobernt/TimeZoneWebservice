@@ -13,7 +13,7 @@
   </header>
 
   <section class="controls">
-    <form id="compare-form" method="get" action="/">
+    <form id="compare-form">
       <div class="control">
         <label for="my_tz">Your time code</label>
         <select id="my_tz" name="my_tz">
@@ -32,9 +32,14 @@
         </select>
       </div>
 
+      <div class="control">
+        <label for="base_time">Time</label>
+        <input type="time" id="base_time" name="base_time" value="{{ diff.a.strftime('%H:%M') }}" />
+      </div>
+
       <div class="control buttons">
         <button type="button" id="swap">Swap</button>
-        <button type="submit">Compare</button>
+        <button type="button" id="compare">Compare</button>
       </div>
     </form>
     <small class="hint">Tip: Your browser's offset auto-fills on load; you can still pick any code.</small>
@@ -44,18 +49,18 @@
     <h2>Now</h2>
     <div class="cards">
       <div class="card">
-        <h3>{{ my_tz }}</h3>
-        <p class="time">{{ diff.a.strftime('%Y-%m-%d %H:%M') }}</p>
-        <p class="offset">UTC {{ diff.a.strftime('%z')[:3] }}:{{ diff.a.strftime('%z')[3:5] }}</p>
+        <h3 id="my_tz_label">{{ my_tz }}</h3>
+        <p class="time" id="my_time">{{ diff.a.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p class="offset" id="my_offset">UTC {{ diff.a.strftime('%z')[:3] }}:{{ diff.a.strftime('%z')[3:5] }}</p>
       </div>
       <div class="card arrow">→</div>
       <div class="card">
-        <h3>{{ other_tz }}</h3>
-        <p class="time">{{ diff.b.strftime('%Y-%m-%d %H:%M') }}</p>
-        <p class="offset">UTC {{ diff.b.strftime('%z')[:3] }}:{{ diff.b.strftime('%z')[3:5] }}</p>
+        <h3 id="other_tz_label">{{ other_tz }}</h3>
+        <p class="time" id="other_time">{{ diff.b.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p class="offset" id="other_offset">UTC {{ diff.b.strftime('%z')[:3] }}:{{ diff.b.strftime('%z')[3:5] }}</p>
       </div>
     </div>
-    <p class="delta">{{ diff.description }} ({{ diff.pretty }})</p>
+    <p class="delta" id="diff_text">{{ diff.description }} ({{ diff.pretty }})</p>
   </section>
 
   <section class="table-section">
