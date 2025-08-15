@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Timezone Comparator</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Timezone Comparator</h1>
+    <p>See every IANA time zone, auto-detect your own, and compare offsets quickly.</p>
+  </header>
+
+  <section class="controls">
+    <form id="compare-form" method="get" action="/">
+      <div class="control">
+        <label for="my_tz">Your timezone</label>
+        <select id="my_tz" name="my_tz">
+          {% for z in zones %}
+            <option value="{{ z }}" {% if z == my_tz %}selected{% endif %}>{{ z }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="control">
+        <label for="other_tz">Compare with</label>
+        <select id="other_tz" name="other_tz">
+          {% for z in zones %}
+            <option value="{{ z }}" {% if z == other_tz %}selected{% endif %}>{{ z }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit">Compare</button>
+    </form>
+    <small class="hint">Tip: Your browser’s time zone will auto-fill on load; you can still pick any zone.</small>
+  </section>
+
+  <section class="result">
+    <h2>Now</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>{{ my_tz }}</h3>
+        <p class="time">{{ diff.a.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p class="offset">UTC {{ diff.a.strftime('%z')[:3] }}:{{ diff.a.strftime('%z')[3:5] }}</p>
+      </div>
+      <div class="card arrow">→</div>
+      <div class="card">
+        <h3>{{ other_tz }}</h3>
+        <p class="time">{{ diff.b.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p class="offset">UTC {{ diff.b.strftime('%z')[:3] }}:{{ diff.b.strftime('%z')[3:5] }}</p>
+      </div>
+    </div>
+    <p class="delta">Difference: <strong>{{ diff.pretty }}</strong></p>
+  </section>
+
+  <section class="table-section">
+    <h2>Quick conversion</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Label</th>
+          <th>{{ my_tz }}</th>
+          <th>{{ other_tz }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in conversion %}
+        <tr>
+          <td>{{ row.label }}</td>
+          <td>{{ row.a.strftime('%a %Y-%m-%d %H:%M') }}</td>
+          <td>{{ row.b.strftime('%a %Y-%m-%d %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="table-section">
+    <h2>All time zones</h2>
+    <input id="search" type="search" placeholder="Search time zones... (e.g., Europe/ , America/ , *UTC*)" />
+    <table class="table" id="zones-table">
+      <thead>
+        <tr>
+          <th>Zone</th>
+          <th>Local time</th>
+          <th>UTC offset</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in all_rows %}
+        <tr>
+          <td>{{ r.zone }}</td>
+          <td>{{ r.now.strftime('%Y-%m-%d %H:%M') }}</td>
+          <td>{{ r.offset }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    <p>Built with Flask &amp; zoneinfo. IANA data via system tzdb/tzdata.</p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

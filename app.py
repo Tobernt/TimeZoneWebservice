@@ -1,0 +1,100 @@
+from __future__ import annotations
+from flask import Flask, render_template, request
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo, available_timezones
+
+app = Flask(__name__)
+
+# Build a sorted list of IANA zones; put "Etc/UTC" at top and group by area
+ALL_ZONES = sorted(available_timezones())
+if "Etc/UTC" in ALL_ZONES:
+    ALL_ZONES.remove("Etc/UTC")
+ZONES = ["Etc/UTC"] + ALL_ZONES
+
+
+def now_utc():
+    return datetime.now(tz=ZoneInfo("UTC"))
+
+
+def fmt_offset(tz: ZoneInfo) -> str:
+    # Returns a pretty UTC offset like "+02:00" or "-05:30"
+    offset = datetime.now(tz).utcoffset() or timedelta()
+    total_minutes = int(offset.total_seconds() // 60)
+    sign = "+" if total_minutes >= 0 else "-"
+    total_minutes = abs(total_minutes)
+    return f"{sign}{total_minutes // 60:02d}:{total_minutes % 60:02d}"
+
+
+def current_time_in_zone(tz_name: str):
+    tz = ZoneInfo(tz_name)
+    dt = now_utc().astimezone(tz)
+    return {
+        "zone": tz_name,
+        "now": dt,
+        "offset": fmt_offset(tz),
+    }
+
+
+def difference(tz_a: str, tz_b: str, at: datetime | None = None):
+    at = at or now_utc()
+    a = at.astimezone(ZoneInfo(tz_a))
+    b = at.astimezone(ZoneInfo(tz_b))
+    delta = (b - a).total_seconds() / 3600.0  # hours (float)
+    # Normalize to absolute hours/minutes for display, keep sign separately
+    sign = 1 if delta >= 0 else -1
+    h = int(abs(delta))
+    m = int(round((abs(delta) - h) * 60))
+    return {
+        "a": a,
+        "b": b,
+        "hours": sign * h,
+        "minutes": sign * m,
+        "pretty": f"{('+' if sign>0 else '-')}{h:01d}h {m:02d}m"
+    }
+
+
+@app.route("/")
+def index():
+    # Optional query params: my_tz, other_tz
+    my_tz = request.args.get("my_tz") or "UTC"
+    other_tz = request.args.get("other_tz") or "Europe/Stockholm"
+
+    # Build quick comparison and a small conversion table
+    conv_base = now_utc()
+    diff = difference(my_tz, other_tz, conv_base)
+
+    # common slots to visualize (local time for tz_a and corresponding tz_b)
+    common_slots = [
+        ("Now", conv_base),
+        ("Today 09:00", conv_base.replace(hour=9, minute=0, second=0, microsecond=0)),
+        ("Today 13:00", conv_base.replace(hour=13, minute=0, second=0, microsecond=0)),
+        ("Today 18:00", conv_base.replace(hour=18, minute=0, second=0, microsecond=0)),
+        ("Tomorrow 09:00", (conv_base + timedelta(days=1)).replace(hour=9, minute=0, second=0, microsecond=0)),
+    ]
+
+    conversion = []
+    for label, base in common_slots:
+        a = base.astimezone(ZoneInfo(my_tz))
+        b = base.astimezone(ZoneInfo(other_tz))
+        conversion.append({
+            "label": label,
+            "a": a,
+            "b": b,
+        })
+
+    # Table of all zones with current time & offset (trimmed client‑side with search)
+    all_rows = [current_time_in_zone(z) for z in ZONES]
+
+    return render_template(
+        "index.html",
+        zones=ZONES,
+        my_tz=my_tz,
+        other_tz=other_tz,
+        diff=diff,
+        conversion=conversion,
+        all_rows=all_rows,
+    )
+
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
