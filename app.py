@@ -1,6 +1,8 @@
 from __future__ import annotations
 from flask import Flask, render_template, request
 from datetime import datetime, timedelta, timezone
+from datetime import tzinfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 # Mapping of short time zone codes to fixed UTC offsets
 CODE_TO_TZ: dict[str, timezone] = {}
@@ -40,7 +42,7 @@ def now_utc():
     return datetime.now(tz=timezone.utc)
 
 
-def fmt_offset(tz: timezone) -> str:
+def fmt_offset(tz: tzinfo) -> str:
     # Returns a pretty UTC offset like "+02:00" or "-05:30"
     offset = datetime.now(tz).utcoffset() or timedelta()
     total_minutes = int(offset.total_seconds() // 60)
@@ -49,8 +51,24 @@ def fmt_offset(tz: timezone) -> str:
     return f"{sign}{total_minutes // 60:02d}:{total_minutes % 60:02d}"
 
 
+def _resolve_tz(tz_name: str) -> tzinfo:
+    """Return a tzinfo for the given name.
+
+    First look up in the predefined CODE_TO_TZ mapping. If not found,
+    attempt to load an IANA time zone using zoneinfo. A KeyError is raised
+    if the zone cannot be resolved.
+    """
+    tz = CODE_TO_TZ.get(tz_name)
+    if tz is not None:
+        return tz
+    try:
+        return ZoneInfo(tz_name)
+    except ZoneInfoNotFoundError as exc:
+        raise KeyError(tz_name) from exc
+
+
 def current_time_in_zone(tz_name: str):
-    tz = CODE_TO_TZ[tz_name]
+    tz = _resolve_tz(tz_name)
     dt = now_utc().astimezone(tz)
     return {
         "zone": tz_name,
@@ -62,8 +80,8 @@ def current_time_in_zone(tz_name: str):
 
 def difference(tz_a: str, tz_b: str, at: datetime | None = None):
     at = at or now_utc()
-    a = at.astimezone(CODE_TO_TZ[tz_a])
-    b = at.astimezone(CODE_TO_TZ[tz_b])
+    a = at.astimezone(_resolve_tz(tz_a))
+    b = at.astimezone(_resolve_tz(tz_b))
     # Compare the UTC offsets to determine the difference between zones
     offset_a = a.utcoffset() or timedelta()
     offset_b = b.utcoffset() or timedelta()
@@ -111,8 +129,8 @@ def index():
 
     conversion = []
     for label, base in common_slots:
-        a = base.astimezone(CODE_TO_TZ[my_tz])
-        b = base.astimezone(CODE_TO_TZ[other_tz])
+        a = base.astimezone(_resolve_tz(my_tz))
+        b = base.astimezone(_resolve_tz(other_tz))
         conversion.append({
             "label": label,
             "a": a,
