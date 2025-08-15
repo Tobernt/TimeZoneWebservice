@@ -1,13 +1,13 @@
 body {
-  font-family: Arial, sans-serif;
-  background: #f5f7fa;
-  color: #333;
+  font-family: system-ui, sans-serif;
+  background: #121212;
+  color: #e0e0e0;
   margin: 0;
 }
 
 header {
-  background: #004d99;
-  color: #fff;
+  background: #1f1f1f;
+  color: #e0e0e0;
   padding: 1rem;
   text-align: center;
 }
@@ -36,10 +36,10 @@ header {
 }
 
 .card {
-  background: #fff;
+  background: #1e1e1e;
   padding: 1rem;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
 
 .card.arrow {
@@ -48,13 +48,14 @@ header {
   font-size: 2rem;
 }
 
+
 .table {
   width: 100%;
   border-collapse: collapse;
 }
 
 .table th, .table td {
-  border: 1px solid #ddd;
+  border: 1px solid #333;
   padding: 0.5rem;
   text-align: left;
 }
@@ -69,6 +70,16 @@ header {
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #444;
+}
+
+select, button {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #444;
+  padding: 0.4rem;
 }
 
 .delta {
@@ -81,5 +92,5 @@ footer {
   text-align: center;
   margin: 2rem 0;
   font-size: 0.9rem;
-  color: #666;
+  color: #999;
 }

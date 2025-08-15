@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Timezone Comparator</title>
+  <title>Time Code Comparator</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <header>
-    <h1>Timezone Comparator</h1>
-    <p>See every IANA time zone, auto-detect your own, and compare offsets quickly.</p>
+    <h1>Time Code Comparator</h1>
+    <p>Browse common time codes, auto-detect your offset, and compare quickly.</p>
   </header>
 
   <section class="controls">
     <form id="compare-form" method="get" action="/">
       <div class="control">
-        <label for="my_tz">Your timezone</label>
+        <label for="my_tz">Your code</label>
         <select id="my_tz" name="my_tz">
           {% for z in zones %}
             <option value="{{ z }}" {% if z == my_tz %}selected{% endif %}>{{ z }}</option>
@@ -37,7 +37,7 @@
         <button type="submit">Compare</button>
       </div>
     </form>
-    <small class="hint">Tip: Your browser's time zone will auto-fill on load; you can still pick any zone.</small>
+    <small class="hint">Tip: Your browser's offset auto-fills on load; you can still pick any code.</small>
   </section>
 
   <section class="result">
@@ -81,8 +81,8 @@
   </section>
 
   <section class="table-section">
-    <h2>All time zones</h2>
-    <input id="search" type="search" placeholder="Search zones or codes (e.g., UTC, GMT, Europe/)" />
+    <h2>All time codes</h2>
+    <input id="search" type="search" placeholder="Search codes (e.g., UTC+02:00, CET)" />
     <table class="table" id="zones-table">
       <thead>
         <tr>
@@ -104,7 +104,7 @@
   </section>
 
   <footer>
-    <p>Built with Flask &amp; zoneinfo. IANA data via system tzdb/tzdata.</p>
+    <p>Built with Flask using fixed UTC offsets.</p>
   </footer>
 
   <script src="/static/app.js"></script>

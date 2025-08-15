@@ -1,14 +1,17 @@
-// Auto-detect browser timezone and set the "Your timezone" dropdown on first load.
+// Auto-detect browser offset and set the dropdown on first load.
 (function initAutoDetect() {
   try {
-    const detected = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const url = new URL(window.location.href);
-    if (!url.searchParams.get('my_tz') && detected) {
-      // Only redirect once; add my_tz while preserving other params
-      url.searchParams.set('my_tz', detected);
+    if (!url.searchParams.get('my_tz')) {
+      const offset = -new Date().getTimezoneOffset(); // minutes east of UTC
+      const sign = offset >= 0 ? '+' : '-';
+      const abs = Math.abs(offset);
+      const h = String(Math.floor(abs / 60)).padStart(2, '0');
+      const m = String(abs % 60).padStart(2, '0');
+      const code = offset === 0 ? 'UTC' : `UTC${sign}${h}:${m}`;
+      url.searchParams.set('my_tz', code);
       if (!url.searchParams.get('other_tz')) {
-        // default to UTC if user is already UTC, else compare with UTC for clarity
-        url.searchParams.set('other_tz', detected === 'Etc/UTC' ? 'Europe/Stockholm' : 'Etc/UTC');
+        url.searchParams.set('other_tz', code === 'UTC' ? 'UTC+01:00' : 'UTC');
       }
       window.location.replace(url.toString());
     }
